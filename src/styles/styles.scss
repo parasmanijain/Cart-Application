@@ -102,7 +102,7 @@ form input:hover, form select:hover, form textarea:hover{
   position:absolute;
   top:0px;
   left:0px;
-  height:35px;
+  height:40px;
   right:0px;
   overflow:hidden;
   padding:5px;
@@ -156,11 +156,11 @@ strong.num {
   padding:5px;
   background-color:$main-color-1;
   color:white;
-  position:absolute; bottom:0px; height:35px; left:0px; right:0px;
+  position:absolute; bottom:0px; height:40px; left:0px; right:0px;
 }
 
 .body {
-  position:absolute; top:35px; bottom:35px; left:0px; right:0px; overflow:auto;
+  position:absolute; top:40px; bottom:40px; left:0px; right:0px; overflow:auto;
 }
 
   .content {
@@ -388,7 +388,8 @@ a.active {
     background: blue;
     border: 0;
     outline: 0;
-    height:10px;
+    height:30px;
+    padding:5px;
   }
   input:focus {
     color: white;
