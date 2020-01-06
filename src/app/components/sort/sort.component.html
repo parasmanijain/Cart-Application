@@ -1,0 +1,58 @@
+<span *ngIf="!isMobile" class="desktop-only">
+  <div id="tabs" #tabs>
+   <div class="row">
+     <div class="col-sm-2">Sort by</div>
+     <div class="col-sm-10 col-md-8 col-lg-6">
+        <ul class="nav row">
+          <li class="nav-item margin-0 col-sm-4 padding-0">
+            <a class="nav-link sort-option active" href="#highLow" [ngClass]="{'active':order ==='highLow'}" (click)="sortProducts('highLow')"
+              data-toggle="tab">Price-- High Low</a>
+          </li>
+          <li class="nav-item text-nowrap col-sm-4 padding-0">
+            <a class="nav-link sort-option" href="#lowHigh" [ngClass]="{ 'active':order ==='lowHigh'}" (click)="sortProducts('lowHigh')"
+              data-toggle="tab">Price-- Low High</a>
+          </li>
+          <li class="nav-item text-nowrap col-sm-4 padding-0">
+            <a class="nav-link sort-option" href="#discount" [ngClass]="{ 'active':order ==='discount'}" (click)="sortProducts('discount')"
+              data-toggle="tab">Discount</a>
+          </li>
+        </ul>
+     </div>
+     
+   </div>
+    </div>
+  </span>
+
+<span *ngIf="isMobile" class="mobile-only">
+  <div class="modal-dialog modal-dialog-centered sort-modal-dialog" #sortProductsModal>
+    <div class="modal-content">
+    <div class="modal-header mobile-options-header">Sort Options</div>
+    <div class="modal-body">
+        <div class="form-check">
+        <input class="form-check-input" type="radio" id="highLowOption" value="highLow" name="sortOption" (change)="changeOption('highLow')" [(ngModel)]="order">
+        <label class="form-check-label" for="highLowOption">
+            Price--High Low
+        </label>
+        </div>
+        <div class="form-check">
+        <input class="form-check-input" type="radio" id="lowHighOption" value="lowHigh" name="sortOption" (change)="changeOption('lowHigh')" [(ngModel)]="order">
+        <label class="form-check-label" for="lowHighOption">
+            Price--Low High
+        </label>
+        </div>
+        <div class="form-check">
+        <input class="form-check-input" type="radio" id="discountOption" value="discount" name="sortOption" (change)="changeOption('discount')" [(ngModel)]="order">
+        <label class="form-check-label" for="discountOption">
+            Discount
+        </label>
+        </div>
+    </div>
+    <div class="modal-footer modal-button-group">
+        <div class="btn-group button-group-container" role="group">
+        <button type="button" (click)="hide()" class="btn btn-light button-submit">Cancel</button>
+        <button type="button" (click)="applySort()" class="btn btn-light button-submit">Apply</button>
+        </div>
+    </div>
+    </div>
+</div>
+</span>

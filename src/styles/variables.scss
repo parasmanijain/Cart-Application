@@ -1,0 +1,75 @@
+@charset "UTF-8";
+ 
+// Colors
+$black: #000;
+$white: #fff;
+$grey-bg: #F6F6F6;
+$form-error: red;
+$form-input: blue;
+// $form-input: #52b9ff;
+// $main-color-1: #08338f;
+// $main-color-2: #0575b8;
+$main-color-3: #00b8e0;
+$main-color-4: #e8f7fd;
+$typo-bg-color-1: #363636;
+$typo-bg-color-2: #dfdfdf;
+$typo-bg-color-3: #efefef;
+$typo-bg-color-4: #f9f9f9;
+$typo-bg-color-5: #999999;
+$typo-bg-color-6: #ededed;
+$typo-bg-color-7: #d2d2d2;
+
+// client branding
+$main-color-1: blue;
+$main-color-2: blue;
+
+// Properties
+$full-width:100% !default;
+$small-font: 22px;
+
+// Reusable Styling
+@mixin common-btn {
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: 0px;
+    width: $full-width ;
+    height: 40px;
+    outline: none;
+    transition: color .15s ease-in-out,background-color 0.15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+@mixin primary-btn {
+    @include common-btn;
+    color: $white;
+    background-color: $main-color-1; 
+}
+@mixin primary-btn-hover {
+    color: $white;
+    background-color: $main-color-2;
+}
+
+@mixin secondary-btn {
+    @include common-btn;
+    color: $black;
+    border: 1px solid $main-color-1;
+}
+@mixin secondary-btn-hover {
+    @include common-btn;
+    color: $white;
+    border: 1px solid $main-color-1;
+    background-color: $main-color-1;
+}
+
+
+
+//FONT SIZE
+
+@mixin font1 {
+    font-size:12px;
+    color: $typo-bg-color-1;
+    
+}

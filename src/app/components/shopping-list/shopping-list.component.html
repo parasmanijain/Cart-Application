@@ -1,0 +1,35 @@
+<div class="container padding-0">
+  <div class="row margin-LR-0">
+    <div class="col-md-3 col-6 card-block" *ngFor="let product of products;">
+      <div class="card text-center card-parent-container">
+        <div class="card-body card-details">
+            <div class="product-image">
+              <img *ngIf="product.imageLoaded" src = "{{product.img_url}}">
+              <div *ngIf="!product.imageLoaded" class="loader"></div>
+            </div>  
+          </div>  
+         
+        <div class="card-footer card-header-footer">
+          <div class="product-name">{{product.name}}</div>
+          <div class="product-details">
+              <span class="offered-price">
+                  {{ product.price - (product.price*(product.discount/100)) | currency:'INR'}}
+              </span>
+              <span class="actual-price">
+                  {{ product.price }}
+              </span>
+              <span class="discount">
+                  {{ (product.discount/100) | percent}} off
+              </span>
+          </div>
+          <div class="product-select">
+            <button class="add-cart" (click)="addProductToShoppingCart(product)">Add Cart</button>
+          </div>
+        </div>
+      </div>  
+    </div>
+    <div *ngIf="products.length===0">
+      No Products to be displayed
+    </div>
+  </div>
+</div>

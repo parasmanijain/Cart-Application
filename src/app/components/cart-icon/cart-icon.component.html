@@ -1,0 +1,88 @@
+<div class="cart-icon-container">
+    <div class="row">
+        <div class="col-md-8 left-card">
+            <div *ngFor="let product of addedProducts" class="card text-center card-block">
+                <div class="card-body cart-card-details">
+                    <div class="row">
+                        <div class="col-4 col-md-3">
+                            <div class="product-image">
+                                <img *ngIf="product.imageLoaded"  src="{{product.productDetails.img_url}}">
+                                <div *ngIf="!product.imageLoaded" class="loader"></div>
+                            </div>
+                        </div>
+                        <div class="col-8 col-md-9">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="product-name">{{product.productDetails.name}}</div>                                    
+                                </div>
+                                <div class="col-8"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="product-details">
+                                        <span class="offered-price">
+                                            {{ product.productDetails.price - (product.productDetails.price*(product.productDetails.discount/100)) | currency:'INR'}}
+                                        </span>
+                                        <span class="actual-price">
+                                            {{ product.productDetails.price }}
+                                        </span>
+                                        <span class="discount">
+                                            {{ (product.productDetails.discount/100) | percent}} off
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <button class="quantity-change-button" (click)="decreaseProductQuantity(product)">-</button>
+                                    <input type="text" class="count-text" [(ngModel)]="product.count">
+                                    <button class="quantity-change-button" (click)="increaseProductQuantity(product)">+</button>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="remove-button" (click)="removeProductFromCart(product)">REMOVE</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+        </div>
+        <div class="col-md-4 right-card">
+            <div class="card card-block">
+                <div class="card-header card-header-footer cart-text">
+                    PRICE DETAILS
+                </div>
+                <div class="card-body card-amount-details cart-text">
+                  <div class="card-text">
+                      <div class="row">
+                        <div class="col-5">
+                            <span *ngIf="totalProducts !== 1">
+                                Price ({{totalProducts}}) items
+                            </span>
+                            <span *ngIf="totalProducts === 1">
+                                Price ({{totalProducts}}) item
+                            </span>
+                        </div>
+                        <div class="col-2">:</div>
+                        <div class="col-5">{{totalActualCost | currency: 'INR'}}</div>
+                      </div>
+                      <div class="row">
+                        <div class="col-5">
+                           Discount
+                        </div>
+                        <div class="col-2">:</div>
+                        <div class="col-5">{{totalDiscount | currency: 'INR'}}</div>
+                      </div>             
+                    
+                </div>
+              </div>
+              <div class="card-footer card-header-footer">
+                <div class="row">
+                    <div class="col-5">
+                       Total Payable
+                    </div>
+                    <div class="col-2"></div>
+                    <div class="col-5">{{totalFinalCost | currency: 'INR'}}</div>
+                  </div>
+              </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="row">
+    <div *ngIf="!isMobile" class="col-md-2 desktop-only">
+        <app-filter></app-filter>
+    </div>
+    <div class="col-md-10 padding-0">
+        <div class="col-md-12 padding-0">
+            <div *ngIf="!isMobile" class="col-md-12 desktop-only">
+                <app-sort></app-sort>
+            </div>
+            <div *ngIf="isMobile" class="col-sm-12 col-12 padding-0 text-center mobile-only">
+                <div class="btn-group button-group-container" role="group">
+                    <button type="button" class="btn btn-light sort-filter-button" (click)="openSortProductsWizard()"><i class="fas fa-sort"></i>Sort</button>
+                    <button type="button" class="btn btn-light sort-filter-button" (click)="openFilterProductsWizard()"><i class="fas fa-filter"></i>Filter</button>
+                </div>
+            </div>
+            <app-shopping-list></app-shopping-list>
+        </div>
+    </div>
+</div>
+   
+<app-modal #sortProductsModal>
+    <app-sort *ngIf="openModal === 'sortProducts'" [modal]="sortProductsModal" (modalClosed)="modalClosed()"></app-sort>
+</app-modal>
+<app-modal #filterProductsModal>
+    <app-filter *ngIf="openModal === 'filterProducts'" [modal]="filterProductsModal" (modalClosed)="modalClosed()"></app-filter>
+</app-modal>

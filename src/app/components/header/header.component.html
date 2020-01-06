@@ -1,0 +1,23 @@
+  <div class="app_header">
+    <div class="header_block">
+      <div class="header-logo-block">
+          
+        <span class="header-icon star-icon">
+            <i class="fas fa-star"></i>
+        </span>
+      </div>
+    </div>
+    <div class="logout_block">
+        <app-search></app-search>
+        <span class="header-icon search-icon">
+            <i class="fas fa-search"></i></span>
+        <span *ngIf="!cartIconLink"class="header-icon cart-icon" routerLink="/cart-icon">
+            <span class="fas fa-shopping-cart">
+                <span *ngIf="addedProductsCount>0" class="cart-container fa-stack fa-3x">
+                    <span class="fa fa-circle fa-stack-1x"></span>
+                    <strong class="fa-stack-1x num">{{addedProductsCount}}</strong>
+                </span>
+            </span>
+        </span>
+    </div>   
+  </div>

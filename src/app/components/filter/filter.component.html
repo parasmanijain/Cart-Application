@@ -1,0 +1,32 @@
+<span *ngIf="!isMobile" class="desktop-only">
+    <div class="filter-header">
+    <h5>Filters</h5>
+    <ng5-slider [(value)]="minValue" [(highValue)]="maxValue" [options]="options"
+    (userChangeEnd)="onUserChangeEnd($event)"></ng5-slider>
+    <div class="filter-footer">
+        <div>Price</div>
+        <button class="apply-price" (click)="applyFilter()">Apply</button>
+    </div>
+    </div>
+</span>
+
+<span *ngIf="isMobile" class="mobile-only">
+    <div class="modal-dialog modal-dialog-centered sort-modal-dialog" #filterProductsModal>
+      <div class="modal-content">
+      <div class="modal-header mobile-options-header">Filter Options</div>
+      <div class="modal-body">
+        <ng5-slider [(value)]="minValue" [(highValue)]="maxValue" [options]="options"
+        (userChangeEnd)="onUserChangeEnd($event)"></ng5-slider>
+        <div class="filter-footer">
+            <div>Price</div>
+        </div>
+      </div>
+      <div class="modal-footer modal-button-group">
+          <div class="btn-group button-group-container" role="group">
+          <button type="button" (click)="hide()" class="btn btn-light button-submit">Cancel</button>
+          <button type="button" (click)="applyFilterMobile()" class="btn btn-light button-submit">Apply</button>
+          </div>
+      </div>
+      </div>
+  </div>
+  </span>
