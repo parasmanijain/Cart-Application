@@ -1,4 +1,4 @@
 export class ProductCounter {
-    productDetails: any;
+    productID: any;
     count: number;
 }

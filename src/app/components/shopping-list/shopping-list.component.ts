@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ProductListService } from '../../services/product-list.service';
 
 @Component({
@@ -6,13 +7,14 @@ import { ProductListService } from '../../services/product-list.service';
   templateUrl: './shopping-list.component.html',
   styleUrls: ['./shopping-list.component.scss']
 })
-export class ShoppingListComponent implements OnInit {
+export class ShoppingListComponent implements OnInit, OnDestroy {
 
+  private subscriptions: Subscription[] = [];
   public products;
   constructor(private productListService: ProductListService) { }
 
   ngOnInit() {
-    this.productListService.displayedProducts.subscribe((data: any) => {
+    this.subscriptions.push(this.productListService.displayedProducts.subscribe((data: any) => {
       if (Array.isArray(data) &&  data.length > 0) {
         this.products = data;
         this.products.forEach(product => {
@@ -28,13 +30,17 @@ export class ShoppingListComponent implements OnInit {
       }
     }, (error) => {
       console.log(error);
-    });
+    }));
   }
 
   addProductToShoppingCart(product) {
-    let count = this.productListService.totalProducts.getValue() ? this.productListService.totalProducts.getValue() : 0;
-    this.productListService.addProducts(product);
-    count++;
-    this.productListService.totalProducts.next(count);
+    this.productListService.updateShoppingCart(product.id, true);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => {
+      sub.unsubscribe();
+    });
+    this.subscriptions = [];
   }
 }

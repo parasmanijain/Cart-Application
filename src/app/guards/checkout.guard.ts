@@ -9,7 +9,7 @@ export class CheckOutGuard implements CanLoad {
   constructor(private router: Router, private productListService: ProductListService) { }
 
   canLoad(): boolean {
-    if (this.productListService.retrieveAddedProducts().getValue().length > 0) {
+    if (this.productListService.addedProducts.getValue().length > 0) {
       return true;
     } else {
       this.router.navigate(['/common']);

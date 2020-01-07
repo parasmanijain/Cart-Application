@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { I18nPluralPipe } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ProductListService } from '../../services/product-list.service';
 
 @Component({
@@ -8,9 +8,11 @@ import { ProductListService } from '../../services/product-list.service';
   templateUrl: './cart-icon.component.html',
   styleUrls: ['./cart-icon.component.scss']
 })
-export class CartIconComponent implements OnInit {
+export class CartIconComponent implements OnInit, OnDestroy {
 
-  public addedProducts;
+  public addedProducts = [];
+  private subscriptions: Subscription[] = [];
+  public products;
   public totalActualCost = 0;
   public totalDiscount = 0;
   public totalFinalCost = 0;
@@ -25,26 +27,19 @@ export class CartIconComponent implements OnInit {
   constructor(private productListService: ProductListService, private router: Router) { }
 
   ngOnInit() {
-    if (this.productListService.retrieveAddedProducts().getValue().length === 0) {
+    if (this.productListService.totalProducts.getValue() === 0) {
       this.router.navigate(['/common']);
     } else {
-      this.productListService.groupAddedProducts();
-      this.productListService.addedProductGrouped.subscribe(data => {
+      this.subscriptions.push(this.productListService.addedProducts.subscribe(data => {
         if (data) {
-          this.totalActualCost = 0;
-          this.totalDiscount = 0;
-          this.totalFinalCost = 0;
-          this.addedProducts = data;
-          data.forEach(product => {
-            this.totalActualCost += (product.productDetails.price * product.count);
-            this.totalDiscount += (product.productDetails.price * (product.productDetails.discount / 100) * product.count);
+          this.addedProducts = data.filter(product => {
+            return (product.count !== 0);
           });
-          this.totalFinalCost = this.totalActualCost - this.totalDiscount;
         }
-      });
-      this.productListService.totalProducts.subscribe(data => {
+      }));
+      this.subscriptions.push(this.productListService.totalProducts.subscribe(data => {
           this.totalProducts = data;
-      });
+      }));
       this.addedProducts.forEach(product => {
         product.imageLoaded = false;
         const image = new Image();
@@ -53,23 +48,38 @@ export class CartIconComponent implements OnInit {
         };
         image.src = product.productDetails.img_url;
       });
+      this.subscriptions.push(this.productListService.totalActualCost.subscribe(data => {
+        this.totalActualCost = data;
+      }));
+      this.subscriptions.push(this.productListService.totalDiscount.subscribe(data => {
+        this.totalDiscount = data;
+      }));
+      this.subscriptions.push(this.productListService.totalFinalCost.subscribe(data => {
+        this.totalFinalCost = data;
+      }));
     }
   }
 
   decreaseProductQuantity(updatedProduct) {
-    if (updatedProduct.count > 0) {
-      updatedProduct.count--;
+    if (updatedProduct.count === 1) {
+      this.productListService.removeProductFromCart(updatedProduct.productDetails.id);
+    } else {
+      this.productListService.updateShoppingCart(updatedProduct.productDetails.id, false);
     }
-    this.productListService.updateProductCount(updatedProduct);
   }
 
   increaseProductQuantity(updatedProduct) {
-    updatedProduct.count++;
-    this.productListService.updateProductCount(updatedProduct);
+    this.productListService.updateShoppingCart(updatedProduct.productDetails.id, true);
   }
 
   removeProductFromCart(removedProduct) {
-    removedProduct.count = 0;
-    this.productListService.removeProductFromCart(removedProduct);
+    this.productListService.removeProductFromCart(removedProduct.productDetails.id);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => {
+      sub.unsubscribe();
+    });
+    this.subscriptions = [];
   }
 }

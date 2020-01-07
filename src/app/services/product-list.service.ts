@@ -2,6 +2,7 @@ declare var AppSettings: any;
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { AddedProduct } from '../models/added-product';
 import { ProductCounter } from '../models/product-counter';
 
 @Injectable({
@@ -10,32 +11,116 @@ import { ProductCounter } from '../models/product-counter';
 export class ProductListService {
 
   public configUrl = AppSettings.API_URL;
-  products = new BehaviorSubject(null);
-  displayedProducts = new BehaviorSubject(null);
-  counterList = [];
+  public products = new BehaviorSubject(null);
+  public displayedProducts = new BehaviorSubject(null);
+  public counterList = [];
   public word = new BehaviorSubject('');
   public min = new BehaviorSubject(0);
   public max = new BehaviorSubject(10000);
   public order = new BehaviorSubject('highLow');
-  private addedProducts: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
-  public addedProductGrouped = new BehaviorSubject(null);
+  public addedProducts = new BehaviorSubject([]);
   public totalProducts = new BehaviorSubject(0);
+  public totalActualCost = new BehaviorSubject(0);
+  public totalFinalCost = new BehaviorSubject(0);
+  public totalDiscount = new BehaviorSubject(0);
   constructor(private http: HttpClient) { }
 
   getProductsList() {
     return this.http.get(this.configUrl).subscribe((data: any) => {
-      this.products.next(data);
+      const addedProducts = [];
       data.forEach(product => {
-        const productCounter = new ProductCounter();
-        productCounter.productDetails = product;
-        productCounter.count = 0;
-        this.counterList.push(productCounter);
+        const addedProduct = new AddedProduct();
+        addedProduct.productDetails = product;
+        addedProduct.count = 0;
+        addedProducts.push(addedProduct);
       });
+      this.addedProducts.next(addedProducts);
+      this.products.next(data);
       this.displayedProducts.next(data);
       this.searchSortFilter();
     }, (error) => {
       console.log(error);
     });
+  }
+
+  updateShoppingCart(productId, flag) {
+    const addedProducts = this.addedProducts.getValue();
+    let totalProducts = this.totalProducts.getValue();
+    addedProducts.forEach(product => {
+      if (product.productDetails.id === productId) {
+        if (flag) {
+          product.count++;
+          totalProducts++;
+        } else {
+          if (product.count > 0) {
+            product.count--;
+            totalProducts--;
+          }
+        }
+      }
+    });
+    this.addedProducts.next(addedProducts);
+    this.updateProductCosts();
+    this.totalProducts.next(totalProducts);
+  }
+
+  updateProductCosts() {
+    let totalActualCost = 0;
+    let totalDiscount = 0;
+    let totalFinalCost = 0;
+    this.addedProducts.getValue().forEach(product => {
+        totalActualCost += (product.productDetails.price * product.count);
+        totalDiscount += ((product.productDetails.price * (product.productDetails.discount / 100)) * product.count);
+        totalFinalCost = totalActualCost - totalDiscount;
+    });
+    this.totalActualCost.next(totalActualCost);
+    this.totalDiscount.next(totalDiscount);
+    this.totalFinalCost.next(totalFinalCost);
+  }
+
+  removeProductFromCart(productID) {
+    let products = this.addedProducts.getValue();
+    let productCount = 0;
+    products = products.filter(product => {
+      if (product.productDetails.id !== productID) {
+        productCount += product.count;
+      } else {
+        product.count = 0;
+      }
+      return product;
+    });
+    this.addedProducts.next(products);
+    this.updateProductCosts();
+    this.totalProducts.next(productCount);
+  }
+
+  searchSortFilter() {
+    let productsList = this.products.getValue();
+    const word = this.word.getValue();
+    const min = this.min.getValue();
+    const max = this.max.getValue();
+    const order = this.order.getValue();
+    productsList = productsList.filter(product => {
+      return ((product.price - (product.price * (product.discount / 100)) >= min) &&
+      (product.price - (product.price * (product.discount / 100)) <= max));
+    });
+    if (word !== '') {
+      productsList = productsList.filter(product => {
+        return (product.name.indexOf(word) !== -1);
+      });
+    }
+    switch (order) {
+      case 'highLow':  productsList.sort(this.sortHighLow);
+                       break;
+      case 'lowHigh':  productsList.sort(this.sortLowHigh);
+                       break;
+      case 'discount': productsList = productsList.filter(product => {
+                       return (product.discount !== 0);
+                       });
+                       productsList.sort(this.sortDiscount);
+                       break;
+    }
+    this.displayedProducts.next(productsList);
   }
 
   sortHighLow(product2, product1) {
@@ -70,90 +155,5 @@ export class ProductListService {
       return 1;
     }
     return 0;
-  }
-
-  addProducts(dataObj) {
-    const currentValue = this.addedProducts.value;
-    const updatedValue = [...currentValue, dataObj];
-    this.addedProducts.next(updatedValue);
-  }
-
-  retrieveAddedProducts() {
-    return this.addedProducts;
-  }
-
-  groupAddedProducts() {
-    const products = this.addedProducts.getValue();
-    let productCount = 0;
-    products.forEach(product => {
-      this.counterList.forEach(productCounter => {
-        if (productCounter.productDetails.id === product.id) {
-          productCounter.count ++;
-        }
-      });
-    });
-    const productAdded = this.counterList.filter(product => {
-      if (product.count > 0) {
-        productCount += product.count;
-      }
-      return (product.count > 0);
-    });
-    this.addedProductGrouped.next(productAdded);
-    this.totalProducts.next(productCount);
-  }
-
-   updateProductCount(updatedProduct) {
-    const products = this.addedProductGrouped.getValue();
-    let productCount = 0;
-    products.forEach(product => {
-      if (product.productDetails.id === updatedProduct.productDetails.id) {
-          product.count = updatedProduct.count;
-      }
-      productCount += product.count;
-    });
-    this.addedProductGrouped.next(products);
-    this.totalProducts.next(productCount);
-  }
-
-  removeProductFromCart(removedProduct) {
-    let products = this.addedProductGrouped.getValue();
-    let productCount = 0;
-    products = products.filter(product => {
-      if (product.productDetails.id !== removedProduct.productDetails.id) {
-        productCount += product.count;
-      }
-      return (product.productDetails.id !== removedProduct.productDetails.id);
-    });
-    this.addedProductGrouped.next(products);
-    this.totalProducts.next(productCount);
-  }
-
-  searchSortFilter() {
-    let productsList = this.products.getValue();
-    const word = this.word.getValue();
-    const min = this.min.getValue();
-    const max = this.max.getValue();
-    const order = this.order.getValue();
-    productsList = productsList.filter(product => {
-      return ((product.price - (product.price * (product.discount / 100)) >= min) &&
-      (product.price - (product.price * (product.discount / 100)) <= max));
-    });
-    if (word !== '') {
-      productsList = productsList.filter(product => {
-        return (product.name.indexOf(word) !== -1);
-      });
-    }
-    switch (order) {
-      case 'highLow':  productsList.sort(this.sortHighLow);
-                       break;
-      case 'lowHigh':  productsList.sort(this.sortLowHigh);
-                       break;
-      case 'discount': productsList = productsList.filter(product => {
-                       return (product.discount !== 0);
-                       });
-                       productsList.sort(this.sortDiscount);
-                       break;
-    }
-    this.displayedProducts.next(productsList);
   }
 }
